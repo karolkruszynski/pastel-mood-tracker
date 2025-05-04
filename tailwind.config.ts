@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,22 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// Pastel mood colors
+				mood: {
+					terrible: '#FF7285',  // soft red
+					bad: '#FFA59E',       // coral
+					neutral: '#FFDE7D',   // soft yellow
+					good: '#A8E6CF',      // mint green
+					great: '#B3D0FF',     // light blue
+				},
+				pastel: {
+					pink: '#FFDEE2',
+					yellow: '#FEF7CD',
+					green: '#E1F8DC',
+					blue: '#D3E4FD',
+					purple: '#E5DEFF',
+					background: '#FDF6F9',
 				}
 			},
 			borderRadius: {
@@ -84,11 +101,16 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'pulse-soft': {
+					'0%, 100%': { opacity: '1' },
+					'50%': { opacity: '0.7' },
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'pulse-soft': 'pulse-soft 2s ease-in-out infinite'
 			}
 		}
 	},
