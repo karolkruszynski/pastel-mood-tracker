@@ -29,47 +29,32 @@ export const DailyMoodTrends = ({ entries }: DailyMoodTrendsProps) => {
     end: endOfToday
   });
   
-  // Create the data structure for the chart
-  const hourlyData = hourIntervals.map(hour => {
-    // Filter entries for this hour
+  // Initialize hourly data with null mood values
+  const initialHourlyData = hourIntervals.map(hour => ({
+    hour: format(hour, "ha"),
+    mood: null as number | null,
+    time: hour
+  }));
+  
+  // Process the entries to calculate average mood per hour
+  const hourlyData = initialHourlyData.map(hourData => {
     const hourEntries = entries.filter(entry => {
       const entryDate = new Date(entry.timestamp);
-      return entryDate.getHours() === hour.getHours() && 
+      return entryDate.getHours() === new Date(hourData.time).getHours() && 
              startOfDay(entryDate).getTime() === today.getTime();
     });
     
-    // Calculate average mood for this hour
-    const averageMood = hourlyData.length > 0
-      ? hourEntries.reduce((sum, entry) => sum + entry.mood, 0) / hourEntries.length
-      : null;
-    
-    return {
-      hour: format(hour, "ha"),
-      mood: averageMood || null,
-      time: hour
-    };
-  });
-  
-  // Fill in the data with actual entries
-  entries.forEach(entry => {
-    const entryDate = new Date(entry.timestamp);
-    if (startOfDay(entryDate).getTime() === today.getTime()) {
-      const hour = entryDate.getHours();
-      const hourIndex = hourlyData.findIndex(data => 
-        new Date(data.time).getHours() === hour
-      );
-      
-      if (hourIndex !== -1) {
-        // If we already have entries for this hour, update the average
-        const existingEntries = entries.filter(e => {
-          const eDate = new Date(e.timestamp);
-          return eDate.getHours() === hour && 
-                 startOfDay(eDate).getTime() === today.getTime();
-        });
-        
-        hourlyData[hourIndex].mood = existingEntries.reduce((sum, e) => sum + e.mood, 0) / existingEntries.length;
-      }
+    // Calculate average mood for this hour if entries exist
+    if (hourEntries.length > 0) {
+      const averageMood = hourEntries.reduce((sum, entry) => sum + entry.mood, 0) / hourEntries.length;
+      return {
+        ...hourData,
+        mood: averageMood
+      };
     }
+    
+    // Return original data if no entries for this hour
+    return hourData;
   });
   
   // Filter out future hours
