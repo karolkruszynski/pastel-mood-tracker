@@ -2,18 +2,15 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-
-type User = {
-  id: string;
-  name: string;
-  email: string;
-} | null;
+import { supabase } from "@/integrations/supabase/client";
+import { User, Session } from "@supabase/supabase-js";
 
 interface AuthContextType {
-  user: User;
-  login: (email: string, password: string) => void;
-  register: (email: string, password: string, name: string) => void;
-  logout: () => void;
+  user: User | null;
+  session: Session | null;
+  login: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string, name: string) => Promise<void>;
+  logout: () => Promise<void>;
   isLoading: boolean;
 }
 
@@ -28,107 +25,98 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<User>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check for saved user in localStorage
-    const savedUser = localStorage.getItem("moodpal_user");
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
-    setIsLoading(false);
+    // Set up auth state listener first
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, currentSession) => {
+        setSession(currentSession);
+        setUser(currentSession?.user ?? null);
+        
+        if (event === 'SIGNED_IN' && currentSession) {
+          toast.success("Signed in successfully");
+        } else if (event === 'SIGNED_OUT') {
+          toast.info("Signed out");
+        }
+      }
+    );
+
+    // Then check for existing session
+    supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+      setSession(currentSession);
+      setUser(currentSession?.user ?? null);
+      setIsLoading(false);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
-  const login = (email: string, password: string) => {
+  const login = async (email: string, password: string) => {
     setIsLoading(true);
-    
-    // Simulate API call with timeout
-    setTimeout(() => {
-      // Mock login check
-      if (email.includes("@") && password.length >= 6) {
-        // Check if we already have this user saved
-        const savedUsers = JSON.parse(localStorage.getItem("moodpal_users") || "[]");
-        const existingUser = savedUsers.find((u: any) => u.email === email);
-        
-        if (existingUser) {
-          // Simple mock password check
-          if (existingUser.password === password) {
-            const userData = {
-              id: existingUser.id,
-              name: existingUser.name,
-              email: existingUser.email
-            };
-            setUser(userData);
-            localStorage.setItem("moodpal_user", JSON.stringify(userData));
-            toast.success(`Welcome back, ${existingUser.name}!`);
-            navigate("/");
-          } else {
-            toast.error("Invalid credentials");
-          }
-        } else {
-          toast.error("User not found");
-        }
-      } else {
-        toast.error("Invalid email or password");
-      }
-      
-      setIsLoading(false);
-    }, 1000);
-  };
-
-  const register = (email: string, password: string, name: string) => {
-    setIsLoading(true);
-    
-    // Simulate API call with timeout
-    setTimeout(() => {
-      // Check if user already exists
-      const savedUsers = JSON.parse(localStorage.getItem("moodpal_users") || "[]");
-      const existingUser = savedUsers.find((user: any) => user.email === email);
-      
-      if (existingUser) {
-        toast.error("User already exists with this email");
-        setIsLoading(false);
-        return;
-      }
-      
-      // Create new user
-      const newUser = {
-        id: `user-${Date.now()}`,
-        name,
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
         email,
-        password // In a real app, NEVER store passwords in localStorage
-      };
+        password
+      });
       
-      // Update users array
-      savedUsers.push(newUser);
-      localStorage.setItem("moodpal_users", JSON.stringify(savedUsers));
+      if (error) {
+        throw error;
+      }
       
-      // Log user in
-      const userData = {
-        id: newUser.id,
-        name: newUser.name,
-        email: newUser.email
-      };
-      
-      setUser(userData);
-      localStorage.setItem("moodpal_user", JSON.stringify(userData));
-      toast.success(`Welcome, ${name}!`);
       navigate("/");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to sign in");
+      console.error("Login error:", error);
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
-  const logout = () => {
-    localStorage.removeItem("moodpal_user");
-    setUser(null);
-    toast.info("You've been signed out");
-    navigate("/login");
+  const register = async (email: string, password: string, name: string) => {
+    setIsLoading(true);
+    try {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            username: name,
+          }
+        }
+      });
+      
+      if (error) {
+        throw error;
+      }
+      
+      toast.success("Registration successful! Please check your email to confirm your account.");
+      navigate("/");
+    } catch (error: any) {
+      toast.error(error.message || "Registration failed");
+      console.error("Registration error:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const logout = async () => {
+    try {
+      await supabase.auth.signOut();
+      navigate("/login");
+    } catch (error: any) {
+      toast.error("Failed to sign out");
+      console.error("Logout error:", error);
+    }
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, session, login, register, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

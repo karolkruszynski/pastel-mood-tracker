@@ -2,6 +2,8 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { MoodEntry } from "@/components/mood/MoodLog";
 import { useAuth } from "./AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface MoodContextType {
   moodEntries: MoodEntry[];
@@ -24,49 +26,85 @@ export const MoodProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuth();
 
-  // Load mood entries from localStorage when component mounts or user changes
+  // Load mood entries from Supabase when component mounts or user changes
   useEffect(() => {
     if (user) {
-      const savedEntries = localStorage.getItem(`moodpal_entries_${user.id}`);
-      if (savedEntries) {
-        try {
-          // Parse the saved entries and convert timestamps back to Date objects
-          const parsedEntries = JSON.parse(savedEntries).map((entry: any) => ({
-            ...entry,
-            timestamp: new Date(entry.timestamp)
-          }));
-          setMoodEntries(parsedEntries);
-        } catch (error) {
-          console.error("Error parsing mood entries:", error);
-          setMoodEntries([]);
-        }
-      } else {
-        setMoodEntries([]);
-      }
+      fetchMoodEntries();
     } else {
       setMoodEntries([]);
+      setIsLoading(false);
     }
-    setIsLoading(false);
   }, [user]);
 
-  // Save mood entries to localStorage when they change
-  useEffect(() => {
-    if (user && !isLoading) {
-      localStorage.setItem(`moodpal_entries_${user.id}`, JSON.stringify(moodEntries));
+  const fetchMoodEntries = async () => {
+    if (!user) return;
+    
+    try {
+      setIsLoading(true);
+      
+      const { data, error } = await supabase
+        .from('mood_entries')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('timestamp', { ascending: false });
+        
+      if (error) {
+        throw error;
+      }
+      
+      const formattedEntries = data.map(entry => ({
+        id: entry.id,
+        mood: entry.mood,
+        note: entry.note || '',
+        timestamp: new Date(entry.timestamp)
+      }));
+      
+      setMoodEntries(formattedEntries);
+    } catch (error) {
+      console.error("Error fetching mood entries:", error);
+      toast.error("Failed to load mood entries");
+    } finally {
+      setIsLoading(false);
     }
-  }, [moodEntries, user, isLoading]);
+  };
 
-  const addMoodEntry = (mood: number, note: string) => {
+  const addMoodEntry = async (mood: number, note: string) => {
     if (!user) return;
 
-    const newEntry: MoodEntry = {
-      id: `mood-${Date.now()}`,
-      mood,
-      note,
-      timestamp: new Date()
-    };
-
-    setMoodEntries(prevEntries => [newEntry, ...prevEntries]);
+    try {
+      // Create new entry object
+      const newEntry = {
+        user_id: user.id,
+        mood,
+        note,
+        timestamp: new Date().toISOString()
+      };
+      
+      // Insert into Supabase
+      const { data, error } = await supabase
+        .from('mood_entries')
+        .insert(newEntry)
+        .select()
+        .single();
+        
+      if (error) {
+        throw error;
+      }
+      
+      // Format and add to local state
+      const formattedEntry: MoodEntry = {
+        id: data.id,
+        mood: data.mood,
+        note: data.note || '',
+        timestamp: new Date(data.timestamp)
+      };
+      
+      setMoodEntries(prev => [formattedEntry, ...prev]);
+      
+    } catch (error) {
+      console.error("Error adding mood entry:", error);
+      toast.error("Failed to save mood entry");
+    }
   };
 
   return (
