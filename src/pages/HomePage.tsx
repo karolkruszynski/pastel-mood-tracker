@@ -1,4 +1,3 @@
-
 import { MoodSelector } from "@/components/mood/MoodSelector";
 import { MoodSummary } from "@/components/dashboard/MoodSummary";
 import { DailyMoodTrends } from "@/components/dashboard/DailyMoodTrends";
@@ -33,10 +32,7 @@ export const HomePage = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card className="bg-white/80 backdrop-blur-sm border border-pastel-pink">
-          <CardHeader>
-            <CardTitle className="text-xl">How are you feeling?</CardTitle>
-          </CardHeader>
-          <CardContent>
+          <CardContent className="pt-6">
             <MoodSelector onMoodSelect={addMoodEntry} />
           </CardContent>
         </Card>

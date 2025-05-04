@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
@@ -48,8 +49,7 @@ export const MoodSelector = ({ onMoodSelect }: MoodSelectorProps) => {
 
   return (
     <div className="w-full max-w-md mx-auto">
-      <div className="text-center mb-6">
-        <h2 className="text-2xl font-bold tracking-tight mb-1">How are you?</h2>
+      <div className="text-center mb-4">
         <p className="text-muted-foreground">
           {format(new Date(), "EEEE, MMM d • h:mm a")}
         </p>

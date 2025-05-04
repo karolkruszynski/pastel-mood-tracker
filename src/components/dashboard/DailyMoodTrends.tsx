@@ -31,7 +31,7 @@ export const DailyMoodTrends = ({ entries }: DailyMoodTrendsProps) => {
   
   // Initialize hourly data with null mood values
   const initialHourlyData = hourIntervals.map(hour => ({
-    hour: format(hour, "ha"),
+    hour: format(hour, "h:mm a"),
     mood: null as number | null,
     time: hour
   }));
@@ -103,11 +103,11 @@ export const DailyMoodTrends = ({ entries }: DailyMoodTrendsProps) => {
               >
                 <defs>
                   <linearGradient id="moodGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#B3D0FF" stopOpacity={0.8} /> {/* Great */}
+                    <stop offset="5%" stopColor="#B3D0FF" stopOpacity={0.8} /> {/* Great */}
                     <stop offset="25%" stopColor="#A8E6CF" stopOpacity={0.8} /> {/* Good */}
                     <stop offset="50%" stopColor="#FFDE7D" stopOpacity={0.8} /> {/* Neutral */}
                     <stop offset="75%" stopColor="#FFA59E" stopOpacity={0.8} /> {/* Bad */}
-                    <stop offset="100%" stopColor="#FF7285" stopOpacity={0.8} /> {/* Terrible */}
+                    <stop offset="95%" stopColor="#FF7285" stopOpacity={0.8} /> {/* Terrible */}
                   </linearGradient>
                 </defs>
                 <XAxis 
@@ -118,6 +118,16 @@ export const DailyMoodTrends = ({ entries }: DailyMoodTrendsProps) => {
                   domain={[1, 5]} 
                   ticks={[1, 2, 3, 4, 5]} 
                   tick={{ fontSize: 12 }} 
+                  tickFormatter={(value) => {
+                    switch(value) {
+                      case 1: return 'Terrible';
+                      case 2: return 'Bad';
+                      case 3: return 'Neutral';
+                      case 4: return 'Good';
+                      case 5: return 'Great';
+                      default: return '';
+                    }
+                  }}
                 />
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                 <Tooltip content={customTooltip} />
