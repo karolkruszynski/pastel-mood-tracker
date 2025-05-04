@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
@@ -29,7 +28,10 @@ export const MoodSelector = ({ onMoodSelect }: MoodSelectorProps) => {
 
   const handleSubmit = () => {
     if (selectedMood === null) {
-      toast.error("Please select a mood");
+      toast.error("Please select a mood", {
+        duration: 1500,
+        closeButton: true,
+      });
       return;
     }
 
@@ -38,7 +40,10 @@ export const MoodSelector = ({ onMoodSelect }: MoodSelectorProps) => {
     setNote("");
     setShowNote(false);
     
-    toast.success("Mood logged successfully!");
+    toast.success("Mood logged successfully!", {
+      duration: 1500,
+      closeButton: true,
+    });
   };
 
   return (

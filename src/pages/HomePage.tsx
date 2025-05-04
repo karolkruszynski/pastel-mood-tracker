@@ -1,6 +1,7 @@
 
 import { MoodSelector } from "@/components/mood/MoodSelector";
 import { MoodSummary } from "@/components/dashboard/MoodSummary";
+import { DailyMoodTrends } from "@/components/dashboard/DailyMoodTrends";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useMood } from "@/contexts/MoodContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -15,6 +16,9 @@ export const HomePage = () => {
     const today = startOfToday();
     return entryDate >= today;
   });
+
+  // Get only the 3 most recent entries for today
+  const recentTodayEntries = todayEntries.slice(0, 3);
 
   return (
     <div className="container px-4 py-8 max-w-4xl mx-auto">
@@ -40,11 +44,13 @@ export const HomePage = () => {
         <MoodSummary entries={moodEntries} />
       </div>
 
-      {todayEntries.length > 0 && (
+      {recentTodayEntries.length > 0 && (
         <div className="mt-8">
-          <h2 className="text-xl font-bold mb-4">Today's Entries</h2>
+          <h2 className="text-xl font-bold mb-4">Today's Entries {todayEntries.length > 3 && 
+            <span className="text-sm font-normal text-muted-foreground ml-2">(showing most recent 3)</span>}
+          </h2>
           <div className="space-y-4">
-            {todayEntries.map((entry) => (
+            {recentTodayEntries.map((entry) => (
               <div key={entry.id} className="p-4 border rounded-lg bg-white/80">
                 <div className="flex items-center gap-2">
                   <div className={`w-2 h-8 rounded-full ${
@@ -55,13 +61,22 @@ export const HomePage = () => {
                     "bg-mood-great"
                   }`} />
                   <div>
-                    <p className="font-medium">
-                      {entry.mood === 1 ? "Terrible" :
-                       entry.mood === 2 ? "Bad" :
-                       entry.mood === 3 ? "Neutral" :
-                       entry.mood === 4 ? "Good" :
-                       "Great"}
-                    </p>
+                    <div className="flex items-center gap-1">
+                      <span className="text-lg">
+                        {entry.mood === 1 ? "😭" :
+                         entry.mood === 2 ? "☹️" :
+                         entry.mood === 3 ? "😐" :
+                         entry.mood === 4 ? "🙂" :
+                         "😄"}
+                      </span>
+                      <p className="font-medium">
+                        {entry.mood === 1 ? "Terrible" :
+                         entry.mood === 2 ? "Bad" :
+                         entry.mood === 3 ? "Neutral" :
+                         entry.mood === 4 ? "Good" :
+                         "Great"}
+                      </p>
+                    </div>
                     <p className="text-sm text-muted-foreground">
                       {new Date(entry.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </p>
@@ -72,9 +87,16 @@ export const HomePage = () => {
                 )}
               </div>
             ))}
+            {todayEntries.length > 3 && (
+              <p className="text-sm text-center text-muted-foreground">
+                {todayEntries.length - 3} more {todayEntries.length - 3 === 1 ? 'entry' : 'entries'} not shown
+              </p>
+            )}
           </div>
         </div>
       )}
+
+      <DailyMoodTrends entries={moodEntries} />
     </div>
   );
 };

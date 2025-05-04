@@ -43,6 +43,15 @@ export const MoodSummary = ({ entries }: MoodSummaryProps) => {
     return "Great";
   };
 
+  const getMoodEmoji = (mood: number | null) => {
+    if (mood === null) return "❓";
+    if (mood < 1.5) return "😭";
+    if (mood < 2.5) return "☹️";
+    if (mood < 3.5) return "😐";
+    if (mood < 4.5) return "🙂";
+    return "😄";
+  };
+
   const getMoodColor = (mood: number | null) => {
     if (mood === null) return "bg-gray-200";
     if (mood < 1.5) return "bg-mood-terrible";
@@ -78,8 +87,11 @@ export const MoodSummary = ({ entries }: MoodSummaryProps) => {
               </div>
             </div>
             
-            <div className={`px-4 py-2 rounded-full font-medium ${getMoodColor(averageTodayMood)} text-white mb-2`}>
-              {getMoodLabel(averageTodayMood)}
+            <div className="flex flex-col items-center mb-2">
+              <div className="text-4xl mb-1">{getMoodEmoji(averageTodayMood)}</div>
+              <div className={`px-4 py-2 rounded-full font-medium ${getMoodColor(averageTodayMood)} text-white`}>
+                {getMoodLabel(averageTodayMood)}
+              </div>
             </div>
             
             <div className="text-sm text-muted-foreground">
