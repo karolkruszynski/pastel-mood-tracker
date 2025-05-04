@@ -2,8 +2,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MoodEntry } from "../mood/MoodLog";
 import { 
-  AreaChart, 
-  Area, 
+  LineChart, 
+  Line, 
   XAxis, 
   YAxis, 
   Tooltip, 
@@ -12,56 +12,75 @@ import {
   CartesianGrid
 } from "recharts";
 import { format, startOfDay, endOfDay, eachHourOfInterval } from "date-fns";
+import { useEffect, useState } from "react";
 
 interface DailyMoodTrendsProps {
   entries: MoodEntry[];
 }
 
 export const DailyMoodTrends = ({ entries }: DailyMoodTrendsProps) => {
-  // Group entries by hour
-  const now = new Date();
-  const today = startOfDay(now);
-  const endOfToday = endOfDay(today);
+  const [chartData, setChartData] = useState<any[]>([]);
   
-  // Create array with each hour of the day
-  const hourIntervals = eachHourOfInterval({
-    start: today,
-    end: endOfToday
-  });
-  
-  // Initialize hourly data with null mood values
-  const initialHourlyData = hourIntervals.map(hour => ({
-    hour: format(hour, "h:mm a"),
-    mood: null as number | null,
-    time: hour
-  }));
-  
-  // Process the entries to calculate average mood per hour
-  const hourlyData = initialHourlyData.map(hourData => {
-    const hourEntries = entries.filter(entry => {
-      const entryDate = new Date(entry.timestamp);
-      return entryDate.getHours() === new Date(hourData.time).getHours() && 
-             startOfDay(entryDate).getTime() === today.getTime();
+  useEffect(() => {
+    // Group entries by hour
+    const now = new Date();
+    const today = startOfDay(now);
+    const endOfToday = endOfDay(today);
+    
+    // Create array with each hour of the day
+    const hourIntervals = eachHourOfInterval({
+      start: today,
+      end: endOfToday
     });
     
-    // Calculate average mood for this hour if entries exist
-    if (hourEntries.length > 0) {
-      const averageMood = hourEntries.reduce((sum, entry) => sum + entry.mood, 0) / hourEntries.length;
-      return {
-        ...hourData,
-        mood: averageMood
-      };
-    }
+    // Initialize hourly data with null mood values
+    const initialHourlyData = hourIntervals.map(hour => ({
+      hour: format(hour, "h:mm a"),
+      mood: null as number | null,
+      time: hour,
+      emoji: ""
+    }));
     
-    // Return original data if no entries for this hour
-    return hourData;
-  });
+    // Process the entries to calculate average mood per hour
+    const hourlyData = initialHourlyData.map(hourData => {
+      const hourEntries = entries.filter(entry => {
+        const entryDate = new Date(entry.timestamp);
+        return entryDate.getHours() === new Date(hourData.time).getHours() && 
+               startOfDay(entryDate).getTime() === today.getTime();
+      });
+      
+      // Calculate average mood for this hour if entries exist
+      if (hourEntries.length > 0) {
+        const averageMood = hourEntries.reduce((sum, entry) => sum + entry.mood, 0) / hourEntries.length;
+        return {
+          ...hourData,
+          mood: averageMood,
+          emoji: getMoodEmoji(averageMood)
+        };
+      }
+      
+      // Return original data if no entries for this hour
+      return hourData;
+    });
+    
+    // Filter out future hours
+    const currentHour = now.getHours();
+    const filteredData = hourlyData.filter(data => 
+      new Date(data.time).getHours() <= currentHour
+    );
+    
+    setChartData(filteredData);
+  }, [entries]);
   
-  // Filter out future hours
-  const currentHour = now.getHours();
-  const filteredHourlyData = hourlyData.filter(data => 
-    new Date(data.time).getHours() <= currentHour
-  );
+  // Helper function to get emoji based on mood value
+  const getMoodEmoji = (mood: number | null) => {
+    if (mood === null) return "";
+    if (mood < 1.5) return "😭";
+    if (mood < 2.5) return "☹️";
+    if (mood < 3.5) return "😐";
+    if (mood < 4.5) return "🙂";
+    return "😄";
+  };
   
   // Custom tooltip formatter
   const customTooltip = ({ active, payload, label }: any) => {
@@ -80,12 +99,19 @@ export const DailyMoodTrends = ({ entries }: DailyMoodTrendsProps) => {
       return (
         <div className="custom-tooltip bg-white p-2 rounded shadow border">
           <p className="font-medium">{label}</p>
-          <p>{mood !== null ? `Mood: ${moodLabel} (${mood.toFixed(1)})` : 'No data'}</p>
+          <p>{mood !== null ? `${payload[0].payload.emoji} ${moodLabel} (${mood.toFixed(1)})` : 'No data'}</p>
         </div>
       );
     }
     
     return null;
+  };
+  
+  // Color mapping for the mood line
+  const moodColors = {
+    stroke: "#8884d8",
+    strokeWidth: 2,
+    activeDot: { r: 8, stroke: "#fff", strokeWidth: 2 }
   };
   
   return (
@@ -95,21 +121,13 @@ export const DailyMoodTrends = ({ entries }: DailyMoodTrendsProps) => {
       </CardHeader>
       <CardContent>
         <div className="h-[200px]">
-          {filteredHourlyData.length > 0 ? (
+          {chartData.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart
-                data={filteredHourlyData}
+              <LineChart
+                data={chartData}
                 margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
               >
-                <defs>
-                  <linearGradient id="moodGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#B3D0FF" stopOpacity={0.8} /> {/* Great */}
-                    <stop offset="25%" stopColor="#A8E6CF" stopOpacity={0.8} /> {/* Good */}
-                    <stop offset="50%" stopColor="#FFDE7D" stopOpacity={0.8} /> {/* Neutral */}
-                    <stop offset="75%" stopColor="#FFA59E" stopOpacity={0.8} /> {/* Bad */}
-                    <stop offset="95%" stopColor="#FF7285" stopOpacity={0.8} /> {/* Terrible */}
-                  </linearGradient>
-                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                 <XAxis 
                   dataKey="hour" 
                   tick={{ fontSize: 12 }} 
@@ -120,26 +138,32 @@ export const DailyMoodTrends = ({ entries }: DailyMoodTrendsProps) => {
                   tick={{ fontSize: 12 }} 
                   tickFormatter={(value) => {
                     switch(value) {
-                      case 1: return 'Terrible';
-                      case 2: return 'Bad';
-                      case 3: return 'Neutral';
-                      case 4: return 'Good';
-                      case 5: return 'Great';
+                      case 1: return '😭';
+                      case 2: return '☹️';
+                      case 3: return '😐';
+                      case 4: return '🙂';
+                      case 5: return '😄';
                       default: return '';
                     }
                   }}
                 />
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                 <Tooltip content={customTooltip} />
-                <ReferenceLine y={3} stroke="#888" strokeDasharray="3 3" />
-                <Area 
+                <ReferenceLine y={3} stroke="#888" strokeDasharray="3 3" label="Neutral" />
+                <Line 
                   type="monotone" 
                   dataKey="mood" 
-                  stroke="#8884d8" 
-                  fill="url(#moodGradient)"
+                  stroke="#8884d8"
+                  strokeWidth={2} 
+                  activeDot={{ r: 8, stroke: "#fff", strokeWidth: 2 }}
                   connectNulls={true}
+                  dot={{ 
+                    stroke: '#8884d8',
+                    strokeWidth: 2,
+                    r: 4,
+                    fill: '#fff'
+                  }}
                 />
-              </AreaChart>
+              </LineChart>
             </ResponsiveContainer>
           ) : (
             <div className="h-full flex items-center justify-center text-muted-foreground text-center">

@@ -87,19 +87,19 @@ export const MoodSummary = ({ entries }: MoodSummaryProps) => {
               </div>
             </div>
             
-            <div className="flex flex-col items-center mb-2">
-              <div className="text-4xl mb-1">{getMoodEmoji(averageTodayMood)}</div>
+            <div className="flex flex-col items-center mb-4 text-center">
+              <div className="text-6xl mb-2">{getMoodEmoji(averageTodayMood)}</div>
               <div className={`px-4 py-2 rounded-full font-medium ${getMoodColor(averageTodayMood)} text-white`}>
                 {getMoodLabel(averageTodayMood)}
               </div>
             </div>
             
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm text-center text-muted-foreground">
               {todayEntries.length} {todayEntries.length === 1 ? 'entry' : 'entries'} today
             </div>
             
             {averageYesterdayMood !== null && (
-              <div className={`mt-2 text-sm ${
+              <div className={`mt-2 text-sm text-center ${
                 getTrend() === "positive" 
                   ? "text-green-600"
                   : getTrend() === "negative" 

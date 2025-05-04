@@ -57,28 +57,34 @@ export const MoodSelector = ({ onMoodSelect }: MoodSelectorProps) => {
 
       <div className="flex justify-between items-end mb-6 relative py-4">
         <div className="absolute bottom-10 w-full h-1 mood-gradient rounded-full"></div>
-        {moods.map((mood) => (
-          <div 
-            key={mood.value} 
-            className="flex flex-col items-center"
-          >
-            <button
-              className={`rounded-full p-3 mb-2 transition-all duration-300 hover:scale-110 ${
-                selectedMood === mood.value 
-                  ? `ring-4 ring-offset-2 ring-offset-pastel-background ring-${mood.color.split('-')[1]}` 
-                  : "hover:ring-2 hover:ring-offset-2 hover:ring-offset-pastel-background hover:ring-gray-200"
-              }`}
-              onClick={() => handleSelectMood(mood.value)}
+        {moods.map((mood) => {
+          const isSelected = selectedMood === mood.value;
+          return (
+            <div 
+              key={mood.value} 
+              className="flex flex-col items-center"
             >
-              <div className="w-14 h-14 rounded-full flex items-center justify-center border-2 border-gray-200 bg-white">
-                {mood.icon}
-              </div>
-            </button>
-            <span className="text-xs text-muted-foreground font-medium">
-              {mood.label}
-            </span>
-          </div>
-        ))}
+              <button
+                className={`rounded-full p-3 mb-2 transition-all duration-300 hover:scale-110 ${
+                  isSelected 
+                    ? `ring-4 ring-offset-2 ring-offset-pastel-background ring-${mood.color.split('-')[1]}` 
+                    : "hover:ring-2 hover:ring-offset-2 hover:ring-offset-pastel-background hover:ring-gray-200"
+                }`}
+                onClick={() => handleSelectMood(mood.value)}
+              >
+                <div className={`w-14 h-14 rounded-full flex items-center justify-center border-2 
+                  ${isSelected ? `border-${mood.color.split('-')[1]} ${mood.color}` : 'border-gray-200 bg-white'}`}>
+                  {mood.icon}
+                </div>
+              </button>
+              <span className={`text-xs font-medium ${
+                isSelected ? 'text-primary' : 'text-muted-foreground'
+              }`}>
+                {mood.label}
+              </span>
+            </div>
+          );
+        })}
       </div>
       
       {showNote && (
