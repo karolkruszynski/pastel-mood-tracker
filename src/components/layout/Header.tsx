@@ -10,9 +10,10 @@ import {
 } from "@/components/ui/sheet";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, Heart } from "lucide-react";
+import { User } from "@supabase/supabase-js";
 
 interface HeaderProps {
-  user: { name: string } | null;
+  user: User | null;
   onLogout: () => void;
 }
 
@@ -27,6 +28,13 @@ export const Header = ({ user, onLogout }: HeaderProps) => {
   ];
   
   const closeDrawer = () => setIsOpen(false);
+
+  // Get display name from user metadata or email
+  const displayName = user ? 
+    (user.user_metadata?.username || 
+     user.user_metadata?.name || 
+     user.email?.split('@')[0] ||
+     'User') : null;
 
   return (
     <header className="py-4 px-4 md:px-6 border-b border-pastel-pink bg-white/60 backdrop-blur-sm sticky top-0 z-10">
@@ -53,7 +61,7 @@ export const Header = ({ user, onLogout }: HeaderProps) => {
           ))}
           {user ? (
             <div className="flex items-center gap-4">
-              <span className="text-sm font-medium">Hi, {user.name}</span>
+              <span className="text-sm font-medium">Hi, {displayName}</span>
               <Button variant="outline" size="sm" onClick={onLogout}>
                 Sign Out
               </Button>
@@ -92,7 +100,7 @@ export const Header = ({ user, onLogout }: HeaderProps) => {
               <div className="mt-4 pt-4 border-t border-gray-100">
                 {user ? (
                   <>
-                    <p className="text-sm text-muted-foreground mb-3">Signed in as {user.name}</p>
+                    <p className="text-sm text-muted-foreground mb-3">Signed in as {displayName}</p>
                     <Button 
                       variant="outline" 
                       className="w-full" 

@@ -1,3 +1,4 @@
+
 import { MoodSelector } from "@/components/mood/MoodSelector";
 import { MoodSummary } from "@/components/dashboard/MoodSummary";
 import { DailyMoodTrends } from "@/components/dashboard/DailyMoodTrends";
@@ -16,6 +17,13 @@ export const HomePage = () => {
     return entryDate >= today;
   });
 
+  // Get display name from user metadata or email
+  const displayName = user ? 
+    (user.user_metadata?.username || 
+     user.user_metadata?.name || 
+     user.email?.split('@')[0] ||
+     'User') : 'Guest';
+
   // Get only the 3 most recent entries for today
   const recentTodayEntries = todayEntries.slice(0, 3);
 
@@ -23,7 +31,7 @@ export const HomePage = () => {
     <div className="container px-4 py-8 max-w-4xl mx-auto">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">
-          {user ? `Hello, ${user.name}` : 'Welcome to MoodPal'}
+          {user ? `Hello, ${displayName}` : 'Welcome to MoodPal'}
         </h1>
         <p className="text-muted-foreground">
           Track and visualize your emotions to better understand your mental health
