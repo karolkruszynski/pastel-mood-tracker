@@ -55,43 +55,57 @@ export const MoodSelector = ({ onMoodSelect }: MoodSelectorProps) => {
         </p>
       </div>
 
-      <div className="flex justify-between items-end mb-6 relative py-4 px-3">
-        <div className="absolute bottom-10 w-full h-1 mood-gradient rounded-full left-0 right-0"></div>
-        {moods.map((mood) => {
-          const isSelected = selectedMood === mood.value;
-          return (
-            <div 
-              key={mood.value} 
-              className="flex flex-col items-center"
-            >
-              <button
-                className={`rounded-full p-3 mb-2 transform transition-all duration-300 ${
-                  isSelected 
-                    ? `ring-4 ring-offset-2 ring-offset-pastel-background ring-${mood.color.split('-')[1]}` 
-                    : "hover:ring-2 hover:ring-offset-2 hover:ring-offset-pastel-background hover:ring-gray-200 hover:scale-105"
-                }`}
-                onClick={() => handleSelectMood(mood.value)}
-                aria-label={`Select ${mood.label} mood`}
+      <div className="flex flex-col px-2">
+        {/* Mood icons with better spacing */}
+        <div className="flex justify-between items-center mb-10 px-1">
+          {moods.map((mood) => {
+            const isSelected = selectedMood === mood.value;
+            return (
+              <div 
+                key={mood.value} 
+                className="flex flex-col items-center"
               >
-                <div className={`w-14 h-14 rounded-full flex items-center justify-center border-2 
-                  ${isSelected ? `border-${mood.color.split('-')[1]} ${mood.color}` : 'border-gray-200 bg-white'}`}>
-                  <div className="flex items-center justify-center">
-                    {mood.icon}
+                <button
+                  className={`rounded-full p-3 transform transition-all duration-300 ${
+                    isSelected 
+                      ? `ring-4 ring-offset-2 ring-offset-pastel-background ring-${mood.color.split('-')[1]}` 
+                      : "hover:ring-2 hover:ring-offset-2 hover:ring-offset-pastel-background hover:ring-gray-200 hover:scale-105"
+                  }`}
+                  onClick={() => handleSelectMood(mood.value)}
+                  aria-label={`Select ${mood.label} mood`}
+                >
+                  <div className={`w-14 h-14 rounded-full flex items-center justify-center border-2 
+                    ${isSelected ? `border-${mood.color.split('-')[1]} ${mood.color}` : 'border-gray-200 bg-white'}`}>
+                    <div className="flex items-center justify-center">
+                      {mood.icon}
+                    </div>
                   </div>
-                </div>
-              </button>
-              <span className={`text-xs font-medium ${
-                isSelected ? 'text-primary' : 'text-muted-foreground'
-              }`}>
+                </button>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Mood bar and labels moved lower */}
+        <div className="relative pb-6 px-2">
+          <div className="absolute top-0 w-full h-1 mood-gradient rounded-full left-0 right-0"></div>
+          <div className="flex justify-between mt-3">
+            {moods.map((mood) => (
+              <span 
+                key={mood.value} 
+                className={`text-xs font-medium ${
+                  selectedMood === mood.value ? 'text-primary' : 'text-muted-foreground'
+                }`}
+              >
                 {mood.label}
               </span>
-            </div>
-          );
-        })}
+            ))}
+          </div>
+        </div>
       </div>
       
       {showNote && (
-        <div className="mb-6 animate-fade-in">
+        <div className="mb-6 animate-fade-in px-2">
           <label className="block text-sm font-medium mb-2">
             Add a note (optional)
           </label>
