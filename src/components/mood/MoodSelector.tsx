@@ -55,8 +55,8 @@ export const MoodSelector = ({ onMoodSelect }: MoodSelectorProps) => {
         </p>
       </div>
 
-      <div className="flex justify-between items-end mb-6 relative py-4">
-        <div className="absolute bottom-10 w-full h-1 mood-gradient rounded-full"></div>
+      <div className="flex justify-between items-end mb-6 relative py-4 px-3">
+        <div className="absolute bottom-10 w-full h-1 mood-gradient rounded-full left-0 right-0"></div>
         {moods.map((mood) => {
           const isSelected = selectedMood === mood.value;
           return (
@@ -65,10 +65,10 @@ export const MoodSelector = ({ onMoodSelect }: MoodSelectorProps) => {
               className="flex flex-col items-center"
             >
               <button
-                className={`rounded-full p-3 mb-2 transition-all duration-300 hover:scale-110 ${
+                className={`rounded-full p-3 mb-2 transform transition-all duration-300 ${
                   isSelected 
                     ? `ring-4 ring-offset-2 ring-offset-pastel-background ring-${mood.color.split('-')[1]}` 
-                    : "hover:ring-2 hover:ring-offset-2 hover:ring-offset-pastel-background hover:ring-gray-200"
+                    : "hover:ring-2 hover:ring-offset-2 hover:ring-offset-pastel-background hover:ring-gray-200 hover:scale-105"
                 }`}
                 onClick={() => handleSelectMood(mood.value)}
                 aria-label={`Select ${mood.label} mood`}

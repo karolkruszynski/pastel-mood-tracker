@@ -2,8 +2,9 @@
 import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MoodEntry } from "../mood/MoodLog";
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine, Label } from "recharts";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts";
 import { format, startOfDay, subDays, eachDayOfInterval } from "date-fns";
+import { FrownIcon, MehIcon, SmileIcon } from "lucide-react";
 
 interface MoodChartProps {
   entries: MoodEntry[];
@@ -35,8 +36,8 @@ export const MoodChart = ({ entries, days = 7, title }: MoodChartProps) => {
     });
   }, [entries, days]);
 
-  const getMoodLabel = (value: number) => {
-    switch (value) {
+  const getMoodLabel = (mood: number) => {
+    switch (mood) {
       case 1: return "Terrible";
       case 2: return "Bad";
       case 3: return "Neutral";
@@ -46,28 +47,20 @@ export const MoodChart = ({ entries, days = 7, title }: MoodChartProps) => {
     }
   };
 
-  const getMoodEmoji = (mood: number | null) => {
-    if (mood === null) return "";
-    if (mood < 1.5) return "😭";
-    if (mood < 2.5) return "☹️";
-    if (mood < 3.5) return "😐";
-    if (mood < 4.5) return "🙂";
-    return "😄";
-  };
-
   // Custom tooltip to display mood label
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       const mood = payload[0].value;
       
       return (
-        <div className="custom-tooltip bg-white p-2 rounded shadow border">
+        <div className="custom-tooltip bg-white p-2 rounded shadow border transform -translate-y-16">
           <p className="font-medium">{label}</p>
           <p>
             {mood !== null ? (
-              <>
-                Mood: {getMoodLabel(Math.round(mood))} {getMoodEmoji(mood)} ({mood.toFixed(1)})
-              </>
+              <div className="flex items-center gap-2">
+                {renderMoodIcon(mood)}
+                <span>{getMoodLabel(Math.round(mood))} ({mood.toFixed(1)})</span>
+              </div>
             ) : (
               'No data'
             )}
@@ -77,6 +70,16 @@ export const MoodChart = ({ entries, days = 7, title }: MoodChartProps) => {
     }
   
     return null;
+  };
+
+  // Helper function to render the appropriate icon based on mood value
+  const renderMoodIcon = (mood: number | null) => {
+    if (mood === null) return null;
+    if (mood < 1.5) return <FrownIcon size={16} className="text-mood-terrible" />;
+    if (mood < 2.5) return <FrownIcon size={16} className="text-mood-bad" />;
+    if (mood < 3.5) return <MehIcon size={16} className="text-mood-neutral" />;
+    if (mood < 4.5) return <SmileIcon size={16} className="text-mood-good" />;
+    return <SmileIcon size={16} className="text-mood-great" />;
   };
 
   // Find the last non-null data point
@@ -91,21 +94,77 @@ export const MoodChart = ({ entries, days = 7, title }: MoodChartProps) => {
     
     // Check if this is the last data point with a valid mood
     if (lastDataPoint && payload.date.getTime() === lastDataPoint.date.getTime() && payload.averageMood !== null) {
+      const IconComponent = getIconComponent(payload.averageMood);
+      const colorClass = getIconColorClass(payload.averageMood);
+      
       return (
-        <text 
-          x={cx} 
-          y={cy} 
-          textAnchor="middle" 
-          dominantBaseline="central"
-          fontSize="22"
+        <foreignObject 
+          x={cx - 12} 
+          y={cy - 12} 
+          width={24} 
+          height={24}
         >
-          {getMoodEmoji(payload.averageMood)}
-        </text>
+          <div className="flex items-center justify-center h-full">
+            <IconComponent className={`h-6 w-6 ${colorClass}`} />
+          </div>
+        </foreignObject>
       );
     }
     
     // Return null for other points to hide the default dots
     return null;
+  };
+
+  const getIconComponent = (mood: number) => {
+    if (mood < 1.5) return FrownIcon;
+    if (mood < 2.5) return FrownIcon;
+    if (mood < 3.5) return MehIcon;
+    if (mood < 4.5) return SmileIcon;
+    return SmileIcon;
+  };
+
+  const getIconColorClass = (mood: number) => {
+    if (mood < 1.5) return "text-mood-terrible";
+    if (mood < 2.5) return "text-mood-bad";
+    if (mood < 3.5) return "text-mood-neutral";
+    if (mood < 4.5) return "text-mood-good";
+    return "text-mood-great";
+  };
+
+  // Custom tick formatter for Y axis
+  const CustomYAxisTick = (props: any) => {
+    const { x, y, payload } = props;
+    
+    let icon;
+    switch(payload.value) {
+      case 1: 
+        icon = <FrownIcon size={16} className="text-mood-terrible" />;
+        break;
+      case 2: 
+        icon = <FrownIcon size={16} className="text-mood-bad" />;
+        break;
+      case 3: 
+        icon = <MehIcon size={16} className="text-mood-neutral" />;
+        break;
+      case 4: 
+        icon = <SmileIcon size={16} className="text-mood-good" />;
+        break;
+      case 5: 
+        icon = <SmileIcon size={16} className="text-mood-great" />;
+        break;
+      default: 
+        icon = null;
+    }
+    
+    return (
+      <g transform={`translate(${x - 10},${y})`}>
+        <foreignObject width={20} height={20} x={-10} y={-10}>
+          <div className="flex items-center justify-center h-full">
+            {icon}
+          </div>
+        </foreignObject>
+      </g>
+    );
   };
 
   return (
@@ -156,27 +215,19 @@ export const MoodChart = ({ entries, days = 7, title }: MoodChartProps) => {
               <YAxis 
                 domain={[1, 5]} 
                 ticks={[1, 2, 3, 4, 5]} 
-                tick={{ fontSize: 12 }}
-                tickFormatter={getMoodLabel} 
+                tick={<CustomYAxisTick />}
+                tickLine={false}
+                axisLine={false}
+                width={30}
               />
-              <Tooltip content={<CustomTooltip />} />
+              <Tooltip content={<CustomTooltip />} cursor={{ strokeDasharray: '3 3' }} />
               
               {/* Reference lines for different moods with their respective colors */}
-              <ReferenceLine y={1} stroke="#FF7285" strokeWidth={1} strokeDasharray="3 3">
-                <Label value="Terrible" position="right" fill="#FF7285" />
-              </ReferenceLine>
-              <ReferenceLine y={2} stroke="#FFA59E" strokeWidth={1} strokeDasharray="3 3">
-                <Label value="Bad" position="right" fill="#FFA59E" />
-              </ReferenceLine>
-              <ReferenceLine y={3} stroke="#FFDE7D" strokeWidth={1} strokeDasharray="3 3">
-                <Label value="Neutral" position="right" fill="#FFDE7D" />
-              </ReferenceLine>
-              <ReferenceLine y={4} stroke="#A8E6CF" strokeWidth={1} strokeDasharray="3 3">
-                <Label value="Good" position="right" fill="#A8E6CF" />
-              </ReferenceLine>
-              <ReferenceLine y={5} stroke="#B3D0FF" strokeWidth={1} strokeDasharray="3 3">
-                <Label value="Great" position="right" fill="#B3D0FF" />
-              </ReferenceLine>
+              <ReferenceLine y={1} stroke="#FF7285" strokeWidth={1} strokeDasharray="3 3" />
+              <ReferenceLine y={2} stroke="#FFA59E" strokeWidth={1} strokeDasharray="3 3" />
+              <ReferenceLine y={3} stroke="#FFDE7D" strokeWidth={1} strokeDasharray="3 3" />
+              <ReferenceLine y={4} stroke="#A8E6CF" strokeWidth={1} strokeDasharray="3 3" />
+              <ReferenceLine y={5} stroke="#B3D0FF" strokeWidth={1} strokeDasharray="3 3" />
               
               {/* Color-coded areas for different mood ranges */}
               <Area 
