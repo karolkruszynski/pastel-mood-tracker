@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -17,48 +16,57 @@ const queryClient = new QueryClient();
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user } = useAuth();
-  
+
   if (!user) {
     return <Navigate to="/login" />;
   }
-  
+
   return <>{children}</>;
 };
 
 const AppRoutes = () => {
   const { user, logout } = useAuth();
-  
+
   return (
     <>
       <Header user={user} onLogout={logout} />
       <main className="min-h-[calc(100vh-4rem)]">
         <Routes>
           <Route path="/login" element={<LoginPage />} />
-          
-          <Route path="/" element={
-            <ProtectedRoute>
-              <MoodProvider>
-                <HomePage />
-              </MoodProvider>
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/dashboard" element={
-            <ProtectedRoute>
-              <MoodProvider>
-                <DashboardPage />
-              </MoodProvider>
-            </ProtectedRoute>
-          } />
-          
-          <Route path="/history" element={
-            <ProtectedRoute>
-              <MoodProvider>
-                <HistoryPage />
-              </MoodProvider>
-            </ProtectedRoute>
-          } />
-          
+
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <MoodProvider>
+                  <HomePage />
+                </MoodProvider>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <MoodProvider>
+                  <DashboardPage />
+                </MoodProvider>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/history"
+            element={
+              <ProtectedRoute>
+                <MoodProvider>
+                  <HistoryPage />
+                </MoodProvider>
+              </ProtectedRoute>
+            }
+          />
+
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>

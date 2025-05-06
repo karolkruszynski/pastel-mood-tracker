@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -32,18 +31,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     // Set up auth state listener first
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, currentSession) => {
-        setSession(currentSession);
-        setUser(currentSession?.user ?? null);
-        
-        if (event === 'SIGNED_IN' && currentSession) {
-          toast.success("Signed in successfully");
-        } else if (event === 'SIGNED_OUT') {
-          toast.info("Signed out");
-        }
-      }
-    );
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, currentSession) => {
+      setSession(currentSession);
+      setUser(currentSession?.user);
+    });
 
     // Then check for existing session
     supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
@@ -62,14 +55,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       const { error } = await supabase.auth.signInWithPassword({
         email,
-        password
+        password,
       });
-      
+
       if (error) {
         throw error;
       }
-      
+
       navigate("/");
+      toast.success("Signed in successfully");
     } catch (error: any) {
       toast.error(error.message || "Failed to sign in");
       console.error("Login error:", error);
@@ -87,15 +81,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         options: {
           data: {
             username: name,
-          }
-        }
+          },
+        },
       });
-      
+
       if (error) {
         throw error;
       }
-      
-      toast.success("Registration successful! Please check your email to confirm your account.");
+
+      toast.success(
+        "Registration successful! Please check your email to confirm your account."
+      );
       navigate("/");
     } catch (error: any) {
       toast.error(error.message || "Registration failed");
@@ -109,6 +105,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       await supabase.auth.signOut();
       navigate("/login");
+      toast.info("Signed out");
     } catch (error: any) {
       toast.error("Failed to sign out");
       console.error("Logout error:", error);
@@ -116,7 +113,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, login, register, logout, isLoading }}>
+    <AuthContext.Provider
+      value={{ user, session, login, register, logout, isLoading }}
+    >
       {children}
     </AuthContext.Provider>
   );
