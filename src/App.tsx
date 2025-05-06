@@ -15,21 +15,22 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user } = useAuth();
+  const { user, isLoading } = useAuth();
 
-  if (!user) {
-    return <Navigate to="/login" />;
+  if (!isLoading) {
+    if (!user) {
+      return <Navigate to="/login" />;
+    }
+    return <>{children}</>;
   }
-
-  return <>{children}</>;
 };
 
 const AppRoutes = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading } = useAuth();
 
   return (
     <>
-      <Header user={user} onLogout={logout} />
+      <Header user={user} onLogout={logout} isLoading={isLoading} />
       <main className="min-h-[calc(100vh-4rem)]">
         <Routes>
           <Route path="/login" element={<LoginPage />} />

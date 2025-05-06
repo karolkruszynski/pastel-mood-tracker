@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useState, useEffect } from "react";
 import { MoodEntry } from "@/components/mood/MoodLog";
 import { useAuth } from "./AuthContext";
@@ -38,27 +37,27 @@ export const MoodProvider = ({ children }: { children: React.ReactNode }) => {
 
   const fetchMoodEntries = async () => {
     if (!user) return;
-    
+
     try {
       setIsLoading(true);
-      
+
       const { data, error } = await supabase
-        .from('mood_entries')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('timestamp', { ascending: false });
-        
+        .from("mood_entries")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("timestamp", { ascending: false });
+
       if (error) {
         throw error;
       }
-      
-      const formattedEntries = data.map(entry => ({
+
+      const formattedEntries = data.map((entry) => ({
         id: entry.id,
         mood: entry.mood,
-        note: entry.note || '',
-        timestamp: new Date(entry.timestamp)
+        note: entry.note || "",
+        timestamp: new Date(entry.timestamp),
       }));
-      
+
       setMoodEntries(formattedEntries);
     } catch (error) {
       console.error("Error fetching mood entries:", error);
@@ -77,30 +76,29 @@ export const MoodProvider = ({ children }: { children: React.ReactNode }) => {
         user_id: user.id,
         mood,
         note,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       };
-      
+
       // Insert into Supabase
       const { data, error } = await supabase
-        .from('mood_entries')
+        .from("mood_entries")
         .insert(newEntry)
         .select()
         .single();
-        
+
       if (error) {
         throw error;
       }
-      
+
       // Format and add to local state
       const formattedEntry: MoodEntry = {
         id: data.id,
         mood: data.mood,
-        note: data.note || '',
-        timestamp: new Date(data.timestamp)
+        note: data.note || "",
+        timestamp: new Date(data.timestamp),
       };
-      
-      setMoodEntries(prev => [formattedEntry, ...prev]);
-      
+
+      setMoodEntries((prev) => [formattedEntry, ...prev]);
     } catch (error) {
       console.error("Error adding mood entry:", error);
       toast.error("Failed to save mood entry");
