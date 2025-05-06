@@ -1,6 +1,7 @@
 
 import { MoodChart } from "@/components/dashboard/MoodChart";
 import { MoodSummary } from "@/components/dashboard/MoodSummary";
+import { MoodTrophies } from "@/components/dashboard/MoodTrophies";
 import { useMood } from "@/contexts/MoodContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -60,6 +61,8 @@ export const DashboardPage = () => {
           </CardContent>
         </Card>
       </div>
+      
+      <MoodTrophies />
       
       <Tabs defaultValue="week" className="w-full">
         <TabsList className="mb-4">
