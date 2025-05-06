@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useMood } from "@/contexts/MoodContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { startOfToday } from "date-fns";
+import { FrownIcon, MehIcon, SmileIcon } from "lucide-react";
 
 export const HomePage = () => {
   const { moodEntries, addMoodEntry } = useMood();
@@ -26,6 +27,15 @@ export const HomePage = () => {
 
   // Get only the 3 most recent entries for today
   const recentTodayEntries = todayEntries.slice(0, 3);
+
+  // Helper function to get mood icon
+  const getMoodIcon = (mood: number) => {
+    if (mood === 1) return <FrownIcon className="w-5 h-5 text-mood-terrible" />;
+    if (mood === 2) return <FrownIcon className="w-5 h-5 text-mood-bad" />;
+    if (mood === 3) return <MehIcon className="w-5 h-5 text-mood-neutral" />;
+    if (mood === 4) return <SmileIcon className="w-5 h-5 text-mood-good" />;
+    return <SmileIcon className="w-5 h-5 text-mood-great" />;
+  };
 
   return (
     <div className="container px-4 py-8 max-w-4xl mx-auto">
@@ -56,7 +66,7 @@ export const HomePage = () => {
           <div className="space-y-4">
             {recentTodayEntries.map((entry) => (
               <div key={entry.id} className="p-4 border rounded-lg bg-white/80">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                   <div className={`w-2 h-8 rounded-full ${
                     entry.mood === 1 ? "bg-mood-terrible" :
                     entry.mood === 2 ? "bg-mood-bad" :
@@ -65,14 +75,10 @@ export const HomePage = () => {
                     "bg-mood-great"
                   }`} />
                   <div>
-                    <div className="flex items-center gap-1">
-                      <span className="text-lg">
-                        {entry.mood === 1 ? "😭" :
-                         entry.mood === 2 ? "☹️" :
-                         entry.mood === 3 ? "😐" :
-                         entry.mood === 4 ? "🙂" :
-                         "😄"}
-                      </span>
+                    <div className="flex items-center gap-2">
+                      <div className="flex items-center justify-center">
+                        {getMoodIcon(entry.mood)}
+                      </div>
                       <p className="font-medium">
                         {entry.mood === 1 ? "Terrible" :
                          entry.mood === 2 ? "Bad" :
@@ -87,7 +93,7 @@ export const HomePage = () => {
                   </div>
                 </div>
                 {entry.note && (
-                  <p className="mt-2 text-sm text-gray-600">{entry.note}</p>
+                  <p className="mt-2 text-sm text-gray-600 pl-5">{entry.note}</p>
                 )}
               </div>
             ))}

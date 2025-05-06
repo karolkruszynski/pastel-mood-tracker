@@ -13,6 +13,7 @@ import {
 } from "recharts";
 import { format, startOfDay, endOfDay, eachHourOfInterval } from "date-fns";
 import { useEffect, useState } from "react";
+import { FrownIcon, MehIcon, SmileIcon } from "lucide-react";
 
 interface DailyMoodTrendsProps {
   entries: MoodEntry[];
@@ -75,31 +76,41 @@ export const DailyMoodTrends = ({ entries }: DailyMoodTrendsProps) => {
   // Helper function to get emoji based on mood value
   const getMoodEmoji = (mood: number | null) => {
     if (mood === null) return "";
-    if (mood < 1.5) return "😭";
-    if (mood < 2.5) return "☹️";
-    if (mood < 3.5) return "😐";
-    if (mood < 4.5) return "🙂";
-    return "😄";
+    if (mood < 1.5) return <FrownIcon className="text-mood-terrible" />;
+    if (mood < 2.5) return <FrownIcon className="text-mood-bad" />;
+    if (mood < 3.5) return <MehIcon className="text-mood-neutral" />;
+    if (mood < 4.5) return <SmileIcon className="text-mood-good" />;
+    return <SmileIcon className="text-mood-great" />;
+  };
+  
+  // Helper function to get mood label
+  const getMoodLabel = (mood: number | null) => {
+    if (mood === null) return "No data";
+    if (mood < 1.5) return "Terrible";
+    if (mood < 2.5) return "Bad";
+    if (mood < 3.5) return "Neutral";
+    if (mood < 4.5) return "Good";
+    return "Great";
   };
   
   // Custom tooltip formatter
   const customTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       const mood = payload[0].value;
-      let moodLabel = "No data";
-      
-      if (mood !== null) {
-        if (mood < 1.5) moodLabel = "Terrible";
-        else if (mood < 2.5) moodLabel = "Bad";
-        else if (mood < 3.5) moodLabel = "Neutral";
-        else if (mood < 4.5) moodLabel = "Good";
-        else moodLabel = "Great";
-      }
       
       return (
-        <div className="custom-tooltip bg-white p-2 rounded shadow border">
+        <div className="custom-tooltip bg-white p-2 rounded shadow border transform -translate-y-16 min-w-[120px]">
           <p className="font-medium">{label}</p>
-          <p>{mood !== null ? `${payload[0].payload.emoji} ${moodLabel} (${mood.toFixed(1)})` : 'No data'}</p>
+          {mood !== null ? (
+            <div className="flex items-center gap-2">
+              <div className="flex items-center justify-center">
+                {getMoodEmoji(mood)}
+              </div>
+              <p>{getMoodLabel(mood)} ({mood.toFixed(1)})</p>
+            </div>
+          ) : (
+            <p>No data</p>
+          )}
         </div>
       );
     }
@@ -107,11 +118,40 @@ export const DailyMoodTrends = ({ entries }: DailyMoodTrendsProps) => {
     return null;
   };
   
-  // Color mapping for the mood line
-  const moodColors = {
-    stroke: "#8884d8",
-    strokeWidth: 2,
-    activeDot: { r: 8, stroke: "#fff", strokeWidth: 2 }
+  // Custom tick formatter for Y axis
+  const CustomYAxisTick = (props: any) => {
+    const { x, y, payload } = props;
+    
+    let icon;
+    switch(payload.value) {
+      case 1: 
+        icon = <FrownIcon size={16} className="text-mood-terrible" />;
+        break;
+      case 2: 
+        icon = <FrownIcon size={16} className="text-mood-bad" />;
+        break;
+      case 3: 
+        icon = <MehIcon size={16} className="text-mood-neutral" />;
+        break;
+      case 4: 
+        icon = <SmileIcon size={16} className="text-mood-good" />;
+        break;
+      case 5: 
+        icon = <SmileIcon size={16} className="text-mood-great" />;
+        break;
+      default: 
+        icon = null;
+    }
+    
+    return (
+      <g transform={`translate(${x - 10},${y})`}>
+        <foreignObject width={20} height={20} x={-10} y={-10}>
+          <div className="flex items-center justify-center h-full">
+            {icon}
+          </div>
+        </foreignObject>
+      </g>
+    );
   };
   
   return (
@@ -125,36 +165,35 @@ export const DailyMoodTrends = ({ entries }: DailyMoodTrendsProps) => {
             <ResponsiveContainer width="100%" height="100%">
               <LineChart
                 data={chartData}
-                margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+                margin={{ top: 20, right: 20, left: 10, bottom: 10 }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                 <XAxis 
                   dataKey="hour" 
-                  tick={{ fontSize: 12 }} 
+                  tick={{ fontSize: 12 }}
+                  dy={10}
                 />
                 <YAxis 
                   domain={[1, 5]} 
                   ticks={[1, 2, 3, 4, 5]} 
-                  tick={{ fontSize: 12 }} 
-                  tickFormatter={(value) => {
-                    switch(value) {
-                      case 1: return '😭';
-                      case 2: return '☹️';
-                      case 3: return '😐';
-                      case 4: return '🙂';
-                      case 5: return '😄';
-                      default: return '';
-                    }
-                  }}
+                  tick={<CustomYAxisTick />}
+                  tickLine={false}
+                  axisLine={false}
+                  width={30}
                 />
-                <Tooltip content={customTooltip} />
-                <ReferenceLine y={3} stroke="#888" strokeDasharray="3 3" label="Neutral" />
+                <Tooltip content={customTooltip} cursor={{ strokeDasharray: '3 3' }} />
+                <ReferenceLine y={3} stroke="#888" strokeDasharray="3 3" />
                 <Line 
                   type="monotone" 
                   dataKey="mood" 
                   stroke="#8884d8"
                   strokeWidth={2} 
-                  activeDot={{ r: 8, stroke: "#fff", strokeWidth: 2 }}
+                  activeDot={{ 
+                    r: 6, 
+                    stroke: "#fff", 
+                    strokeWidth: 2,
+                    fill: "#8884d8"
+                  }}
                   connectNulls={true}
                   dot={{ 
                     stroke: '#8884d8',

@@ -2,6 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MoodEntry } from "../mood/MoodLog";
 import { startOfToday, startOfDay, subDays } from "date-fns";
+import { FrownIcon, MehIcon, SmileIcon } from "lucide-react";
 
 interface MoodSummaryProps {
   entries: MoodEntry[];
@@ -44,12 +45,12 @@ export const MoodSummary = ({ entries }: MoodSummaryProps) => {
   };
 
   const getMoodEmoji = (mood: number | null) => {
-    if (mood === null) return "❓";
-    if (mood < 1.5) return "😭";
-    if (mood < 2.5) return "☹️";
-    if (mood < 3.5) return "😐";
-    if (mood < 4.5) return "🙂";
-    return "😄";
+    if (mood === null) return <div className="w-12 h-12 flex items-center justify-center text-gray-400">?</div>;
+    if (mood < 1.5) return <FrownIcon size={40} className="text-mood-terrible" />;
+    if (mood < 2.5) return <FrownIcon size={40} className="text-mood-bad" />;
+    if (mood < 3.5) return <MehIcon size={40} className="text-mood-neutral" />;
+    if (mood < 4.5) return <SmileIcon size={40} className="text-mood-good" />;
+    return <SmileIcon size={40} className="text-mood-great" />;
   };
 
   const getMoodColor = (mood: number | null) => {
@@ -87,8 +88,10 @@ export const MoodSummary = ({ entries }: MoodSummaryProps) => {
               </div>
             </div>
             
-            <div className="flex flex-col items-center mb-4 text-center">
-              <div className="text-6xl mb-2">{getMoodEmoji(averageTodayMood)}</div>
+            <div className="flex flex-col items-center mb-6 text-center">
+              <div className="mb-3 flex items-center justify-center">
+                {getMoodEmoji(averageTodayMood)}
+              </div>
               <div className={`px-4 py-2 rounded-full font-medium ${getMoodColor(averageTodayMood)} text-white`}>
                 {getMoodLabel(averageTodayMood)}
               </div>

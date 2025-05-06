@@ -71,10 +71,13 @@ export const MoodSelector = ({ onMoodSelect }: MoodSelectorProps) => {
                     : "hover:ring-2 hover:ring-offset-2 hover:ring-offset-pastel-background hover:ring-gray-200"
                 }`}
                 onClick={() => handleSelectMood(mood.value)}
+                aria-label={`Select ${mood.label} mood`}
               >
                 <div className={`w-14 h-14 rounded-full flex items-center justify-center border-2 
                   ${isSelected ? `border-${mood.color.split('-')[1]} ${mood.color}` : 'border-gray-200 bg-white'}`}>
-                  {mood.icon}
+                  <div className="flex items-center justify-center">
+                    {mood.icon}
+                  </div>
                 </div>
               </button>
               <span className={`text-xs font-medium ${
