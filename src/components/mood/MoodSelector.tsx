@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
@@ -15,11 +14,36 @@ export const MoodSelector = ({ onMoodSelect }: MoodSelectorProps) => {
   const [showNote, setShowNote] = useState(false);
 
   const moods = [
-    { value: 1, label: "Terrible", icon: <FrownIcon className="h-8 w-8 text-mood-terrible" />, color: "bg-mood-terrible" },
-    { value: 2, label: "Bad", icon: <FrownIcon className="h-8 w-8 text-mood-bad" />, color: "bg-mood-bad" },
-    { value: 3, label: "Neutral", icon: <MehIcon className="h-8 w-8 text-mood-neutral" />, color: "bg-mood-neutral" },
-    { value: 4, label: "Good", icon: <SmileIcon className="h-8 w-8 text-mood-good" />, color: "bg-mood-good" },
-    { value: 5, label: "Great", icon: <SmileIcon className="h-8 w-8 text-mood-great" />, color: "bg-mood-great" },
+    {
+      value: 1,
+      label: "Terrible",
+      icon: <FrownIcon className="h-8 w-8 text-mood-terrible" />,
+      color: "bg-mood-terrible",
+    },
+    {
+      value: 2,
+      label: "Bad",
+      icon: <FrownIcon className="h-8 w-8 text-mood-bad" />,
+      color: "bg-mood-bad",
+    },
+    {
+      value: 3,
+      label: "Neutral",
+      icon: <MehIcon className="h-8 w-8 text-mood-neutral" />,
+      color: "bg-mood-neutral",
+    },
+    {
+      value: 4,
+      label: "Good",
+      icon: <SmileIcon className="h-8 w-8 text-mood-good" />,
+      color: "bg-mood-good",
+    },
+    {
+      value: 5,
+      label: "Great",
+      icon: <SmileIcon className="h-8 w-8 text-mood-great" />,
+      color: "bg-mood-great",
+    },
   ];
 
   const handleSelectMood = (mood: number) => {
@@ -40,7 +64,7 @@ export const MoodSelector = ({ onMoodSelect }: MoodSelectorProps) => {
     setSelectedMood(null);
     setNote("");
     setShowNote(false);
-    
+
     toast.success("Mood logged successfully!", {
       duration: 1500,
       closeButton: true,
@@ -55,27 +79,26 @@ export const MoodSelector = ({ onMoodSelect }: MoodSelectorProps) => {
         </p>
       </div>
 
-      <div className="flex flex-col px-2">
+      <div className="flex flex-col">
         {/* Mood icons with better spacing */}
-        <div className="flex justify-between items-center mb-10 px-1">
+        <div className="flex justify-evenly items-center mb-10 flex-wrap mt-5">
           {moods.map((mood) => {
             const isSelected = selectedMood === mood.value;
             return (
-              <div 
-                key={mood.value} 
-                className="flex flex-col items-center"
-              >
+              <div key={mood.value} className="flex flex-col items-center">
                 <button
-                  className={`rounded-full p-3 transform transition-all duration-300 ${
-                    isSelected 
-                      ? `ring-4 ring-offset-2 ring-offset-pastel-background ring-${mood.color.split('-')[1]}` 
-                      : "hover:ring-2 hover:ring-offset-2 hover:ring-offset-pastel-background hover:ring-gray-200 hover:scale-105"
+                  className={`rounded-full p-1.5 transform transition-all duration-300 ${
+                    isSelected
+                      ? `ring-2 ring-gray-200 scale-105`
+                      : "hover:ring-2  hover:ring-gray-200 hover:scale-105"
                   }`}
                   onClick={() => handleSelectMood(mood.value)}
                   aria-label={`Select ${mood.label} mood`}
                 >
-                  <div className={`w-14 h-14 rounded-full flex items-center justify-center border-2 
-                    ${isSelected ? `border-${mood.color.split('-')[1]} ${mood.color}` : 'border-gray-200 bg-white'}`}>
+                  <div
+                    className={` rounded-full  flex items-center justify-center 
+                    ${isSelected ? `bg-zinc-50` : "border-gray-200 bg-white"}`}
+                  >
                     <div className="flex items-center justify-center">
                       {mood.icon}
                     </div>
@@ -89,12 +112,12 @@ export const MoodSelector = ({ onMoodSelect }: MoodSelectorProps) => {
         {/* Mood bar and labels moved lower */}
         <div className="relative pb-6 px-2">
           <div className="absolute top-0 w-full h-1 mood-gradient rounded-full left-0 right-0"></div>
-          <div className="flex justify-between mt-3">
+          <div className="flex justify-evenly mt-3 sm:gap-4">
             {moods.map((mood) => (
-              <span 
-                key={mood.value} 
-                className={`text-xs font-medium ${
-                  selectedMood === mood.value ? 'text-primary' : 'text-muted-foreground'
+              <span
+                key={mood.value}
+                className={`text-xs font-medium py-1 px-2 rounded-sm ${
+                  selectedMood === mood.value ? mood.color : ""
                 }`}
               >
                 {mood.label}
@@ -103,7 +126,7 @@ export const MoodSelector = ({ onMoodSelect }: MoodSelectorProps) => {
           </div>
         </div>
       </div>
-      
+
       {showNote && (
         <div className="mb-6 animate-fade-in px-2">
           <label className="block text-sm font-medium mb-2">
@@ -119,7 +142,7 @@ export const MoodSelector = ({ onMoodSelect }: MoodSelectorProps) => {
         </div>
       )}
 
-      <Button 
+      <Button
         onClick={handleSubmit}
         disabled={selectedMood === null}
         className="w-full"
