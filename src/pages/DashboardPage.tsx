@@ -1,7 +1,6 @@
 
 import { MoodChart } from "@/components/dashboard/MoodChart";
 import { MoodSummary } from "@/components/dashboard/MoodSummary";
-import { MoodTrophies } from "@/components/dashboard/MoodTrophies";
 import { useMood } from "@/contexts/MoodContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -66,7 +65,6 @@ export const DashboardPage = () => {
         <TabsList className="mb-4">
           <TabsTrigger value="week">This Week</TabsTrigger>
           <TabsTrigger value="month">This Month</TabsTrigger>
-          <TabsTrigger value="achievements">Achievements</TabsTrigger>
         </TabsList>
         
         <TabsContent value="week">
@@ -75,19 +73,6 @@ export const DashboardPage = () => {
         
         <TabsContent value="month">
           <MoodChart entries={moodEntries} days={30} title="Monthly Mood Trends" />
-        </TabsContent>
-        
-        <TabsContent value="achievements">
-          <div className="space-y-8">
-            <div>
-              <h2 className="text-2xl font-semibold mb-4">Your Achievements</h2>
-              <MoodTrophies showUnlocked={true} />
-            </div>
-            <div>
-              <h2 className="text-2xl font-semibold mb-4">Achievements to Unlock</h2>
-              <MoodTrophies showUnlocked={false} />
-            </div>
-          </div>
         </TabsContent>
       </Tabs>
     </div>

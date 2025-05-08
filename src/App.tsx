@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -7,6 +8,7 @@ import { LoginPage } from "./pages/LoginPage";
 import { HomePage } from "./pages/HomePage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { HistoryPage } from "./pages/HistoryPage";
+import { AchievementsPage } from "./pages/AchievementsPage";
 import { Header } from "./components/layout/Header";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { MoodProvider } from "./contexts/MoodContext";
@@ -63,6 +65,17 @@ const AppRoutes = () => {
               <ProtectedRoute>
                 <MoodProvider>
                   <HistoryPage />
+                </MoodProvider>
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/achievements"
+            element={
+              <ProtectedRoute>
+                <MoodProvider>
+                  <AchievementsPage />
                 </MoodProvider>
               </ProtectedRoute>
             }

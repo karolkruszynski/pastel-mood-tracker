@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,6 +26,7 @@ export const Header = ({ user, onLogout, isLoading }: HeaderProps) => {
     { name: "Home", path: "/" },
     { name: "Dashboard", path: "/dashboard" },
     { name: "History", path: "/history" },
+    { name: "Achievements", path: "/achievements" },
   ];
 
   const closeDrawer = () => setIsOpen(false);
