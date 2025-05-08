@@ -22,18 +22,31 @@ export const DailyMoodTrends = ({ entries }: DailyMoodTrendsProps) => {
   const [chartData, setChartData] = useState<any[]>([]);
 
   useEffect(() => {
-    // Group entries by hour
     const now = new Date();
     const today = startOfDay(now);
     const endOfToday = endOfDay(today);
 
-    // Create array with each hour of the day
+    const todaysEntries = entries.filter((entry) => {
+      const entryDate = new Date(entry.timestamp);
+      return startOfDay(entryDate).getTime() === today.getTime();
+    });
+
+    const firstEntryTime =
+      todaysEntries.length > 0
+        ? new Date(
+            Math.min(
+              ...todaysEntries.map((entry) =>
+                new Date(entry.timestamp).getTime()
+              )
+            )
+          )
+        : today;
+
     const hourIntervals = eachHourOfInterval({
-      start: entries[0]?.timestamp,
+      start: firstEntryTime,
       end: endOfToday,
     });
 
-    // Initialize hourly data with null mood values
     const initialHourlyData = hourIntervals.map((hour) => ({
       hour: format(hour, "h:mm a"),
       mood: null as number | null,
@@ -41,17 +54,12 @@ export const DailyMoodTrends = ({ entries }: DailyMoodTrendsProps) => {
       emoji: "",
     }));
 
-    // Process the entries to calculate average mood per hour
     const hourlyData = initialHourlyData.map((hourData) => {
-      const hourEntries = entries.filter((entry) => {
+      const hourEntries = todaysEntries.filter((entry) => {
         const entryDate = new Date(entry.timestamp);
-        return (
-          entryDate.getHours() === new Date(hourData.time).getHours() &&
-          startOfDay(entryDate).getTime() === today.getTime()
-        );
+        return entryDate.getHours() === new Date(hourData.time).getHours();
       });
 
-      // Calculate average mood for this hour if entries exist
       if (hourEntries.length > 0) {
         const averageMood =
           hourEntries.reduce((sum, entry) => sum + entry.mood, 0) /
@@ -63,14 +71,12 @@ export const DailyMoodTrends = ({ entries }: DailyMoodTrendsProps) => {
         };
       }
 
-      // Return original data if no entries for this hour
       return hourData;
     });
 
-    // Filter out future hours
     const currentHour = now.getHours();
     const filteredData = hourlyData.filter(
-      (data) => new Date(data.time).getHours() >= currentHour
+      (data) => new Date(data.time).getHours() <= currentHour
     );
 
     setChartData(filteredData);
