@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MoodEntry } from "../mood/MoodLog";
 import { startOfToday, startOfDay, subDays } from "date-fns";
@@ -11,30 +10,41 @@ interface MoodSummaryProps {
 export const MoodSummary = ({ entries }: MoodSummaryProps) => {
   const today = startOfToday();
   const yesterday = startOfDay(subDays(today, 1));
-  
-  const todayEntries = entries.filter(entry => 
-    startOfDay(new Date(entry.timestamp)).getTime() === today.getTime()
+
+  const todayEntries = entries.filter(
+    (entry) =>
+      startOfDay(new Date(entry.timestamp)).getTime() === today.getTime()
   );
-  
-  const yesterdayEntries = entries.filter(entry => 
-    startOfDay(new Date(entry.timestamp)).getTime() === yesterday.getTime()
+
+  const yesterdayEntries = entries.filter(
+    (entry) =>
+      startOfDay(new Date(entry.timestamp)).getTime() === yesterday.getTime()
   );
-  
-  const averageTodayMood = todayEntries.length 
-    ? Math.round(todayEntries.reduce((sum, entry) => sum + entry.mood, 0) / todayEntries.length * 10) / 10
+
+  const averageTodayMood = todayEntries.length
+    ? Math.round(
+        (todayEntries.reduce((sum, entry) => sum + entry.mood, 0) /
+          todayEntries.length) *
+          10
+      ) / 10
     : null;
-  
-  const averageYesterdayMood = yesterdayEntries.length 
-    ? Math.round(yesterdayEntries.reduce((sum, entry) => sum + entry.mood, 0) / yesterdayEntries.length * 10) / 10
+
+  const averageYesterdayMood = yesterdayEntries.length
+    ? Math.round(
+        (yesterdayEntries.reduce((sum, entry) => sum + entry.mood, 0) /
+          yesterdayEntries.length) *
+          10
+      ) / 10
     : null;
-  
+
   const getTrend = () => {
-    if (averageTodayMood === null || averageYesterdayMood === null) return "neutral";
+    if (averageTodayMood === null || averageYesterdayMood === null)
+      return "neutral";
     if (averageTodayMood > averageYesterdayMood) return "positive";
     if (averageTodayMood < averageYesterdayMood) return "negative";
     return "neutral";
   };
-  
+
   const getMoodLabel = (mood: number | null) => {
     if (mood === null) return "No data";
     if (mood < 1.5) return "Terrible";
@@ -45,8 +55,14 @@ export const MoodSummary = ({ entries }: MoodSummaryProps) => {
   };
 
   const getMoodEmoji = (mood: number | null) => {
-    if (mood === null) return <div className="w-12 h-12 flex items-center justify-center text-gray-400">?</div>;
-    if (mood < 1.5) return <FrownIcon size={40} className="text-mood-terrible" />;
+    if (mood === null)
+      return (
+        <div className="w-12 h-12 flex items-center justify-center text-gray-400">
+          ?
+        </div>
+      );
+    if (mood < 1.5)
+      return <FrownIcon size={40} className="text-mood-terrible" />;
     if (mood < 2.5) return <FrownIcon size={40} className="text-mood-bad" />;
     if (mood < 3.5) return <MehIcon size={40} className="text-mood-neutral" />;
     if (mood < 4.5) return <SmileIcon size={40} className="text-mood-good" />;
@@ -61,11 +77,10 @@ export const MoodSummary = ({ entries }: MoodSummaryProps) => {
     if (mood < 4.5) return "bg-mood-good";
     return "bg-mood-great";
   };
-  
+
   // Calculate the percentage for the gauge
-  const gaugePercentage = averageTodayMood !== null 
-    ? ((averageTodayMood - 1) / 4) * 100 
-    : 0;
+  const gaugePercentage =
+    averageTodayMood !== null ? ((averageTodayMood - 1) / 4) * 100 : 0;
 
   return (
     <Card className="bg-white/80 backdrop-blur-sm border border-pastel-pink">
@@ -82,39 +97,50 @@ export const MoodSummary = ({ entries }: MoodSummaryProps) => {
           <>
             <div className="relative w-48 h-24 overflow-hidden mb-4">
               <div className="absolute w-full h-full mood-gradient rounded-t-full"></div>
-              <div className="absolute bottom-0 left-1/2 w-1 h-12 bg-black -ml-0.5" 
-                   style={{ transform: `rotate(${gaugePercentage * 1.8 - 90}deg)`, transformOrigin: 'bottom center' }}>
+              <div
+                className="absolute bottom-0 left-1/2 w-1 h-12 bg-black -ml-0.5"
+                style={{
+                  transform: `rotate(${gaugePercentage * 1.8 - 90}deg)`,
+                  transformOrigin: "bottom center",
+                }}
+              >
                 <div className="w-3 h-3 rounded-full bg-black -mt-3 -ml-1"></div>
               </div>
             </div>
-            
+
             <div className="flex flex-col items-center mb-6 text-center">
               <div className="mb-3 flex items-center justify-center">
                 {getMoodEmoji(averageTodayMood)}
               </div>
-              <div className={`px-4 py-2 rounded-full font-medium ${getMoodColor(averageTodayMood)} text-white`}>
+              <div
+                className={`px-4 py-2 rounded-full font-medium ${getMoodColor(
+                  averageTodayMood
+                )} text-white`}
+              >
                 {getMoodLabel(averageTodayMood)}
               </div>
             </div>
-            
+
             <div className="text-sm text-center text-muted-foreground">
-              {todayEntries.length} {todayEntries.length === 1 ? 'entry' : 'entries'} today
+              {todayEntries.length}{" "}
+              {todayEntries.length === 1 ? "entry" : "entries"} today
             </div>
-            
+
             {averageYesterdayMood !== null && (
-              <div className={`mt-2 text-sm text-center ${
-                getTrend() === "positive" 
-                  ? "text-green-600"
-                  : getTrend() === "negative" 
-                    ? "text-red-600" 
+              <div
+                className={`mt-2 text-sm text-center ${
+                  getTrend() === "positive"
+                    ? "text-green-600"
+                    : getTrend() === "negative"
+                    ? "text-red-600"
                     : "text-yellow-600"
-              }`}>
-                {getTrend() === "positive" 
+                }`}
+              >
+                {getTrend() === "positive"
                   ? "↑ Better than yesterday"
-                  : getTrend() === "negative" 
-                    ? "↓ Worse than yesterday"
-                    : "→ Same as yesterday"
-                }
+                  : getTrend() === "negative"
+                  ? "↓ Worse than yesterday"
+                  : "→ Same as yesterday"}
               </div>
             )}
           </>
