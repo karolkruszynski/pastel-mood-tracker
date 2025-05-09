@@ -1,5 +1,8 @@
+
 import { MoodChart } from "@/components/dashboard/MoodChart";
 import { MoodSummary } from "@/components/dashboard/MoodSummary";
+import { DailyMoodTrends } from "@/components/dashboard/DailyMoodTrends";
+import { OtherMoodStats } from "@/components/dashboard/OtherMoodStats";
 import { useMood } from "@/contexts/MoodContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -159,6 +162,10 @@ export const DashboardPage = () => {
           />
         </TabsContent>
       </Tabs>
+      
+      <OtherMoodStats entries={moodEntries} />
+      
+      <DailyMoodTrends entries={moodEntries} />
     </div>
   );
 };
