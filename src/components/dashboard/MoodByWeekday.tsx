@@ -83,11 +83,11 @@ export const MoodByWeekday = ({ entries }: MoodByWeekdayProps) => {
 
   const getMoodColor = (mood: number | null) => {
     if (mood === null) return "bg-gray-200";
-    if (mood < 1.5) return "bg-mood-terrible";
-    if (mood < 2.5) return "bg-mood-bad";
-    if (mood < 3.5) return "bg-mood-neutral";
-    if (mood < 4.5) return "bg-mood-good";
-    return "bg-mood-great";
+    if (mood < 1.5) return "#ff7285";
+    if (mood < 2.5) return "#ffa59e";
+    if (mood < 3.5) return "#ffde7d";
+    if (mood < 4.5) return "#a8e6cf";
+    return "#b3d0ff";
   };
 
   // Get mood label based on value
@@ -140,10 +140,7 @@ export const MoodByWeekday = ({ entries }: MoodByWeekdayProps) => {
                   <Tooltip content={<CustomTooltip />} />
                   <Bar dataKey="avgMood" radius={[4, 4, 0, 0]}>
                     {data.map((entry, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        className={`fill-${entry.fill.slice(3)}`}
-                      />
+                      <Cell key={`cell-${index}`} fill={entry.fill} />
                     ))}
                   </Bar>
                 </BarChart>
