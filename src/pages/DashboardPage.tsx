@@ -1,4 +1,3 @@
-
 import { MoodChart } from "@/components/dashboard/MoodChart";
 import { MoodSummary } from "@/components/dashboard/MoodSummary";
 import { OtherMoodStats } from "@/components/dashboard/OtherMoodStats";
@@ -85,8 +84,8 @@ export const DashboardPage = () => {
             <CardTitle className="text-xl">Mood Stats</CardTitle>
           </CardHeader>
           <CardContent className="flex-1">
-            <dl className="grid grid-cols-1 md:grid-cols-3 gap-4 min-h-full">
-              <div className="bg-secondary/50 rounded-lg p-4 shadow-lg  flex flex-col justify-around">
+            <dl className="grid grid-cols-1 md:grid-cols-3 gap-4 ">
+              <div className="bg-secondary/50 rounded-lg p-4 shadow-lg  flex flex-col justify-around  md:min-h-[250px] ">
                 <dt className="text-sm text-muted-foreground uppercase font-semibold h-10 ">
                   Total Entries
                 </dt>
@@ -95,7 +94,7 @@ export const DashboardPage = () => {
                 </dd>
               </div>
 
-              <div className="bg-secondary/50 rounded-lg p-4  shadow-lg  flex flex-col justify-around ">
+              <div className="bg-secondary/50 rounded-lg p-4  shadow-lg  flex flex-col justify-around">
                 <dt className="text-sm text-muted-foreground uppercase font-semibold h-10 ">
                   Average Mood
                 </dt>
@@ -162,9 +161,9 @@ export const DashboardPage = () => {
           />
         </TabsContent>
       </Tabs>
-      
+
       <OtherMoodStats entries={moodEntries} />
-      
+
       <MoodByWeekday entries={moodEntries} />
     </div>
   );
