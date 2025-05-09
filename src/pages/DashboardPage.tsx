@@ -1,8 +1,8 @@
 
 import { MoodChart } from "@/components/dashboard/MoodChart";
 import { MoodSummary } from "@/components/dashboard/MoodSummary";
-import { DailyMoodTrends } from "@/components/dashboard/DailyMoodTrends";
 import { OtherMoodStats } from "@/components/dashboard/OtherMoodStats";
+import { MoodByWeekday } from "@/components/dashboard/MoodByWeekday";
 import { useMood } from "@/contexts/MoodContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -165,7 +165,7 @@ export const DashboardPage = () => {
       
       <OtherMoodStats entries={moodEntries} />
       
-      <DailyMoodTrends entries={moodEntries} />
+      <MoodByWeekday entries={moodEntries} />
     </div>
   );
 };
