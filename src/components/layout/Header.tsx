@@ -9,8 +9,9 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, Heart } from "lucide-react";
+import { Menu, Heart, Palette } from "lucide-react";
 import { User } from "@supabase/supabase-js";
+import { ThemedIcon } from "@/components/ui/themed-icon";
 
 interface HeaderProps {
   user: User | null;
@@ -27,6 +28,7 @@ export const Header = ({ user, onLogout, isLoading }: HeaderProps) => {
     { name: "Dashboard", path: "/dashboard" },
     { name: "History", path: "/history" },
     { name: "Achievements", path: "/achievements" },
+    { name: "Themes", path: "/themes", icon: <Palette className="w-4 h-4 ml-1" /> },
   ];
 
   const closeDrawer = () => setIsOpen(false);
@@ -44,7 +46,7 @@ export const Header = ({ user, onLogout, isLoading }: HeaderProps) => {
       <div className="container mx-auto flex justify-between items-center">
         <Link to="/" className="flex items-center gap-2">
           <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center">
-            <Heart className="h-5 w-5 text-white" />
+            <ThemedIcon icon={Heart} className="h-5 w-5 text-white" />
           </div>
           <span className="font-bold text-xl">MoodPal</span>
         </Link>
@@ -56,13 +58,14 @@ export const Header = ({ user, onLogout, isLoading }: HeaderProps) => {
               <Link
                 key={item.name}
                 to={item.path}
-                className={`text-sm font-medium transition-colors hover:text-primary ${
+                className={`text-sm font-medium transition-colors hover:text-primary flex items-center ${
                   location.pathname === item.path
                     ? "text-primary"
                     : "text-muted-foreground"
                 }`}
               >
                 {item.name}
+                {item.icon && item.icon}
               </Link>
             ))}
           {user && (
@@ -97,7 +100,7 @@ export const Header = ({ user, onLogout, isLoading }: HeaderProps) => {
                   <Link
                     key={item.name}
                     to={item.path}
-                    className={`text-sm font-medium py-2 px-3 rounded-md hover:bg-secondary transition-colors ${
+                    className={`text-sm font-medium py-2 px-3 rounded-md hover:bg-secondary transition-colors flex items-center ${
                       location.pathname === item.path
                         ? "bg-secondary text-primary"
                         : ""
@@ -105,6 +108,7 @@ export const Header = ({ user, onLogout, isLoading }: HeaderProps) => {
                     onClick={closeDrawer}
                   >
                     {item.name}
+                    {item.icon && item.icon}
                   </Link>
                 ))}
               <div className="mt-4 pt-4 border-t border-gray-100">

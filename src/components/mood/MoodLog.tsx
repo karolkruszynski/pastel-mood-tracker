@@ -1,8 +1,8 @@
-
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { format } from "date-fns";
 import { FrownIcon, MehIcon, SmileIcon } from "lucide-react";
+import { ThemedIcon } from "@/components/ui/themed-icon";
 
 export interface MoodEntry {
   id: string;
@@ -19,9 +19,19 @@ export const MoodLog = ({ entries }: MoodLogProps) => {
   const [expandedEntryId, setExpandedEntryId] = useState<string | null>(null);
 
   const getMoodIcon = (mood: number) => {
-    if (mood <= 2) return <FrownIcon className={`h-5 w-5 ${mood === 1 ? 'text-mood-terrible' : 'text-mood-bad'}`} />;
-    if (mood === 3) return <MehIcon className="h-5 w-5 text-mood-neutral" />;
-    return <SmileIcon className={`h-5 w-5 ${mood === 4 ? 'text-mood-good' : 'text-mood-great'}`} />;
+    if (mood <= 2) {
+      return <ThemedIcon 
+        icon={FrownIcon} 
+        className={`h-5 w-5 ${mood === 1 ? 'text-mood-terrible' : 'text-mood-bad'}`} 
+      />;
+    }
+    if (mood === 3) {
+      return <ThemedIcon icon={MehIcon} className="h-5 w-5 text-mood-neutral" />;
+    }
+    return <ThemedIcon 
+      icon={SmileIcon} 
+      className={`h-5 w-5 ${mood === 4 ? 'text-mood-good' : 'text-mood-great'}`} 
+    />;
   };
 
   const getMoodLabel = (mood: number) => {

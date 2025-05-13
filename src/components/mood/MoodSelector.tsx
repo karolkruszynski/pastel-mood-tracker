@@ -1,8 +1,10 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { FrownIcon, MehIcon, SmileIcon } from "lucide-react";
+import { ThemedIcon } from "@/components/ui/themed-icon";
 
 interface MoodSelectorProps {
   onMoodSelect: (mood: number, note: string) => void;
@@ -17,31 +19,31 @@ export const MoodSelector = ({ onMoodSelect }: MoodSelectorProps) => {
     {
       value: 1,
       label: "Terrible",
-      icon: <FrownIcon className="h-8 w-8 text-mood-terrible" />,
+      icon: <ThemedIcon icon={FrownIcon} className="h-8 w-8 text-mood-terrible" />,
       color: "bg-mood-terrible",
     },
     {
       value: 2,
       label: "Bad",
-      icon: <FrownIcon className="h-8 w-8 text-mood-bad" />,
+      icon: <ThemedIcon icon={FrownIcon} className="h-8 w-8 text-mood-bad" />,
       color: "bg-mood-bad",
     },
     {
       value: 3,
       label: "Neutral",
-      icon: <MehIcon className="h-8 w-8 text-mood-neutral" />,
+      icon: <ThemedIcon icon={MehIcon} className="h-8 w-8 text-mood-neutral" />,
       color: "bg-mood-neutral",
     },
     {
       value: 4,
       label: "Good",
-      icon: <SmileIcon className="h-8 w-8 text-mood-good" />,
+      icon: <ThemedIcon icon={SmileIcon} className="h-8 w-8 text-mood-good" />,
       color: "bg-mood-good",
     },
     {
       value: 5,
       label: "Great",
-      icon: <SmileIcon className="h-8 w-8 text-mood-great" />,
+      icon: <ThemedIcon icon={SmileIcon} className="h-8 w-8 text-mood-great" />,
       color: "bg-mood-great",
     },
   ];

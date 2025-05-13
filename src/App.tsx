@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,9 +9,11 @@ import { HomePage } from "./pages/HomePage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { HistoryPage } from "./pages/HistoryPage";
 import { AchievementsPage } from "./pages/AchievementsPage";
+import { ThemesPage } from "./pages/ThemesPage";
 import { Header } from "./components/layout/Header";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { MoodProvider } from "./contexts/MoodContext";
+import { ThemesProvider } from "./contexts/ThemesContext";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -80,6 +83,15 @@ const AppRoutes = () => {
             }
           />
 
+          <Route
+            path="/themes"
+            element={
+              <ProtectedRoute>
+                <ThemesPage />
+              </ProtectedRoute>
+            }
+          />
+
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
@@ -94,7 +106,9 @@ const App = () => (
       <Sonner position="top-right" />
       <BrowserRouter>
         <AuthProvider>
-          <AppRoutes />
+          <ThemesProvider>
+            <AppRoutes />
+          </ThemesProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
