@@ -9,6 +9,7 @@ const TOAST_LIMIT = 5
 const TOAST_REMOVE_DELAY = 1000000
 
 type ToastActionElement = React.ReactElement<typeof ToastAction>
+
 type ToasterToast = ToastProps & {
   id: string
   title?: React.ReactNode
