@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       mood_entries: {
         Row: {
+          context_tags: string[] | null
           created_at: string
           id: string
           mood: number
@@ -25,6 +26,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          context_tags?: string[] | null
           created_at?: string
           id?: string
           mood: number
@@ -34,6 +36,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          context_tags?: string[] | null
           created_at?: string
           id?: string
           mood?: number

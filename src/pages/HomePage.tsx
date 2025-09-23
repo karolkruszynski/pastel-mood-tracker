@@ -2,6 +2,7 @@ import { MoodSelector } from "@/components/mood/MoodSelector";
 import { MoodSummary } from "@/components/dashboard/MoodSummary";
 import { DailyMoodTrends } from "@/components/dashboard/DailyMoodTrends";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ContextBadge } from "@/components/mood/ContextBadge";
 import { useMood } from "@/contexts/MoodContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { startOfToday } from "date-fns";
@@ -115,6 +116,22 @@ export const HomePage = () => {
                   <p className="mt-2 text-sm text-gray-600 pl-5">
                     {entry.note}
                   </p>
+                )}
+                {entry.context_tags && entry.context_tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-2 pl-5">
+                    {entry.context_tags.slice(0, 3).map((contextId) => (
+                      <ContextBadge 
+                        key={contextId} 
+                        contextId={contextId} 
+                        size="sm" 
+                      />
+                    ))}
+                    {entry.context_tags.length > 3 && (
+                      <span className="text-xs text-gray-500 flex items-center">
+                        +{entry.context_tags.length - 3} more
+                      </span>
+                    )}
+                  </div>
                 )}
               </div>
             ))}

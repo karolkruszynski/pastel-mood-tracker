@@ -1,12 +1,19 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { MoodEntry } from "@/components/mood/MoodLog";
 import { useAuth } from "./AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
+interface MoodEntry {
+  id: string;
+  mood: number;
+  note: string;
+  timestamp: Date;
+  context_tags?: string[];
+}
+
 interface MoodContextType {
   moodEntries: MoodEntry[];
-  addMoodEntry: (mood: number, note: string) => void;
+  addMoodEntry: (mood: number, note: string, contexts?: string[]) => void;
   isLoading: boolean;
 }
 
@@ -41,11 +48,11 @@ export const MoodProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       setIsLoading(true);
 
-      const { data, error } = await supabase
-        .from("mood_entries")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("timestamp", { ascending: false });
+        const { data, error } = await supabase
+          .from("mood_entries")  
+          .select("*")
+          .eq("user_id", user.id)
+          .order("timestamp", { ascending: false });
 
       if (error) {
         throw error;
@@ -56,6 +63,7 @@ export const MoodProvider = ({ children }: { children: React.ReactNode }) => {
         mood: entry.mood,
         note: entry.note || "",
         timestamp: new Date(entry.timestamp),
+        context_tags: entry.context_tags || [],
       }));
 
       setMoodEntries(formattedEntries);
@@ -67,7 +75,7 @@ export const MoodProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const addMoodEntry = async (mood: number, note: string) => {
+  const addMoodEntry = async (mood: number, note: string, contexts: string[] = []) => {
     if (!user) return;
 
     try {
@@ -76,6 +84,7 @@ export const MoodProvider = ({ children }: { children: React.ReactNode }) => {
         user_id: user.id,
         mood,
         note,
+        context_tags: contexts,
         timestamp: new Date().toISOString(),
       };
 
@@ -96,6 +105,7 @@ export const MoodProvider = ({ children }: { children: React.ReactNode }) => {
         mood: data.mood,
         note: data.note || "",
         timestamp: new Date(data.timestamp),
+        context_tags: data.context_tags || [],
       };
 
       setMoodEntries((prev) => [formattedEntry, ...prev]);

@@ -3,12 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { format } from "date-fns";
 import { FrownIcon, MehIcon, SmileIcon } from "lucide-react";
 import { ThemedIcon } from "@/components/ui/themed-icon";
+import { ContextBadge } from "./ContextBadge";
 
 export interface MoodEntry {
   id: string;
   mood: number;
   note: string;
   timestamp: Date;
+  context_tags?: string[];
 }
 
 interface MoodLogProps {
@@ -97,9 +99,21 @@ export const MoodLog = ({ entries }: MoodLogProps) => {
                   <p className="text-sm font-medium flex items-center gap-1">
                     {getMoodIcon(entry.mood)} {getMoodLabel(entry.mood)}
                   </p>
-                  <p className="text-xs text-muted-foreground">
-                    {format(entry.timestamp, "MMM d, h:mm a")}
-                  </p>
+                  <div className="text-sm text-muted-foreground">
+                    {format(entry.timestamp, "PPp")}
+                  </div>
+                  
+                  {entry.context_tags && entry.context_tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {entry.context_tags.map((contextId) => (
+                        <ContextBadge 
+                          key={contextId} 
+                          contextId={contextId} 
+                          size="sm" 
+                        />
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

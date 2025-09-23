@@ -1,19 +1,23 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { FrownIcon, MehIcon, SmileIcon } from "lucide-react";
 import { ThemedIcon } from "@/components/ui/themed-icon";
+import { ContextSelector } from "./ContextSelector";
 
 interface MoodSelectorProps {
-  onMoodSelect: (mood: number, note: string) => void;
+  onMoodSelect: (mood: number, note: string, contexts?: string[]) => void;
 }
 
 export const MoodSelector = ({ onMoodSelect }: MoodSelectorProps) => {
   const [selectedMood, setSelectedMood] = useState<number | null>(null);
   const [note, setNote] = useState("");
   const [showNote, setShowNote] = useState(false);
+  const [contextTrackingEnabled, setContextTrackingEnabled] = useState(false);
+  const [selectedContexts, setSelectedContexts] = useState<string[]>([]);
 
   const moods = [
     {
@@ -62,10 +66,11 @@ export const MoodSelector = ({ onMoodSelect }: MoodSelectorProps) => {
       return;
     }
 
-    onMoodSelect(selectedMood, note);
+    onMoodSelect(selectedMood, note, contextTrackingEnabled ? selectedContexts : []);
     setSelectedMood(null);
     setNote("");
     setShowNote(false);
+    setSelectedContexts([]);
 
     toast.success("Mood logged successfully!", {
       duration: 1500,
@@ -128,6 +133,27 @@ export const MoodSelector = ({ onMoodSelect }: MoodSelectorProps) => {
           </div>
         </div>
       </div>
+
+      {/* Context Tracking Toggle */}
+      <div className="flex items-center justify-between mb-4 px-2">
+        <label className="text-sm font-medium text-gray-700">
+          Enable Context Tracking
+        </label>
+        <Switch
+          checked={contextTrackingEnabled}
+          onCheckedChange={setContextTrackingEnabled}
+        />
+      </div>
+
+      {/* Context Selection */}
+      {contextTrackingEnabled && (
+        <div className="mb-6 animate-fade-in px-2">
+          <ContextSelector
+            selectedContexts={selectedContexts}
+            onContextChange={setSelectedContexts}
+          />
+        </div>
+      )}
 
       {showNote && (
         <div className="mb-6 animate-fade-in px-2">
