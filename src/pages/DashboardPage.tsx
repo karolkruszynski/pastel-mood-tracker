@@ -102,11 +102,11 @@ export const DashboardPage = () => {
                   {moodEntries.length === 0 ? (
                     <span className="text-lg font-medium ">No data</span>
                   ) : (
-                    <div className=" gap-2 relative flex items-center">
-                      <span className="text-3xl font-bold md:text-5xl ">
+                    <div className="gap-2 relative flex items-center">
+                      <span className="text-3xl font-bold md:text-5xl">
                         {averageMood}
                       </span>
-                      <div className="md:absolute -bottom-10">
+                      <div className="ml-2">
                         {getMoodEmoji(averageMood)}
                       </div>
                     </div>
